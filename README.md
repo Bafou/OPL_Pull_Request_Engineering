@@ -10,16 +10,16 @@ Utilisation :
 
 
 Mise en place :
-Java
-Fichier de configuration des règles (xml, json) ajouter dans le projet Github
+- Java
+- Fichier de configuration des règles (xml, json) ajouter dans le projet Github
 
 
 Outils externes:
-Checkstyle
-PMD
+- Checkstyle
+- PMD
 
 Fonctionnalité principale :
-Execution du controle de style seulement sur le code modifié par la PR.
+- Execution du controle de style seulement sur le code modifié par la PR.
 
 Evaluation :
 
