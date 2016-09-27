@@ -5,7 +5,7 @@ Utilisation :
 - 1ere etape : lancement du .jar (site web à terme ?) avec identifiant du projet github.
 - Un contributeur crée une PR sur le projet github.
 - L'outil récupère les infos de la PR (code...)
-- L'outil controle de style.
+- L'outil controle de style **sur le code modifié par la PR**.
 - L'outil ajout un commentaire à la PR (checkstyle OK, KO et pourquoi).
 
 
@@ -18,8 +18,6 @@ Outils externes:
 - Checkstyle
 - PMD
 
-Fonctionnalité principale :
-- Execution du controle de style seulement sur le code modifié par la PR.
 
 Evaluation :
 
