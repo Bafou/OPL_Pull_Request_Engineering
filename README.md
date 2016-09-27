@@ -10,8 +10,8 @@ Utilisation :
 
 
 Mise en place :
-- Java
-- Fichier de configuration des règles (xml, json) ajouter dans le projet Github
+- Langage vérifié = Java
+- Fichier de configuration des règles (xml, json) ajouté dans le projet Github
 
 
 Outils externes:
