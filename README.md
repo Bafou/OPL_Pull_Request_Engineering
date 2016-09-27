@@ -14,6 +14,7 @@ Mise en place :
 - Fichier de configuration des règles (xml, json) ajouté dans le projet Github
 
 
+
 Outils externes:
 - Checkstyle
 - PMD
