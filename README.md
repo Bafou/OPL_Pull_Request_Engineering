@@ -2,11 +2,11 @@
 
 
 Utilisation : 
-1ere etape : lancement du .jar (site web à terme ?) avec identifiant du projet github.
-Un contributeur crée une PR sur le projet github.
-L'outil récupère les infos de la PR (code...)
-L'outil controle de style.
-L'outil ajout un commentaire à la PR (checkstyle OK, KO et pourquoi).
+- 1ere etape : lancement du .jar (site web à terme ?) avec identifiant du projet github.
+- Un contributeur crée une PR sur le projet github.
+- L'outil récupère les infos de la PR (code...)
+- L'outil controle de style.
+- L'outil ajout un commentaire à la PR (checkstyle OK, KO et pourquoi).
 
 
 Mise en place :
