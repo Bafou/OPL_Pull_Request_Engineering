@@ -23,3 +23,9 @@ Outils externes:
 Evaluation :
 Faire un clone d'un gros projet et tester l'execution de l'outil avec différentes PR sur celui-ci.
 Comparer le temps d'execution de checkstyle sur le projet en entier et notre solution.
+
+# Todo
+- [ ] Recup une PR (webhook)
+- [ ] Recup du diff, pull
+- [ ] Mettre les ligne de code modifiés dans un fichier
+
