@@ -23,9 +23,9 @@ public class Start {
 	public static void main(String[] args) throws IOException {
 		System.out.println("Welcome in initiation of the check pull request server : ");
 		System.out.println("Please enter the token needed to write a comment : ");
-		System.out.println("Your token is taken in account, waiting for webhook");
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		token = br.readLine();
+		System.out.println("Your token is taken in account, waiting for webhook");
 		
 		HttpServer server = null;
 		try {
@@ -106,7 +106,7 @@ public class Start {
 
 		public static void commentPR(final String issueUrl, final String token) {
 			System.out.println("Writing the comment");
-			String stringUrl = issueUrl+ "/comments";
+			final String stringUrl = issueUrl+ "/comments";
 			System.out.println("Write to url : " + stringUrl);
 
 			try {
@@ -142,7 +142,7 @@ public class Start {
 			// From now on, the right way of moving from bytes to utf-8
 			// characters;
 			int b;
-			StringBuilder buf = new StringBuilder();
+			final StringBuilder buf = new StringBuilder();
 
 			while ((b = br.read()) != -1) {
 				buf.append((char) b);
