@@ -1,12 +1,15 @@
 package fr.univlille1.m2iagl.kruczek.petit;
 
 import java.io.BufferedReader;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Date;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -17,16 +20,20 @@ import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
 public class Start {
-	
-	public static String token = "";// Antoine token = 97174177adc084e5329cd1b4adb8bf4777bb2a79
+
+	public static String token = "";// Antoine token =
+									// db948b18b3c47a3ac8b396f224c299a018b4b2b0
 
 	public static void main(String[] args) throws IOException {
-		System.out.println("Welcome in initiation of the check pull request server : ");
-		System.out.println("Please enter the token needed to write a comment : ");
+		System.out
+				.println("Welcome in initiation of the check pull request server : ");
+		System.out
+				.println("Please enter the token needed to write a comment : ");
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		token = br.readLine();
-		System.out.println("Your token is taken in account, waiting for webhook");
-		
+		System.out
+				.println("Your token is taken in account, waiting for webhook");
+
 		HttpServer server = null;
 		try {
 			server = HttpServer.create(new InetSocketAddress(8000), 0);
@@ -40,12 +47,11 @@ public class Start {
 	}
 
 	static class MyHandler implements HttpHandler {
-		
+
 		private static final String USER_AGENT = "Check-Pull-Request";
-		
+
 		public void handle(final HttpExchange httpExchange) throws IOException {
 
-			
 			String bodyString = null;
 			try {
 				bodyString = getBody(httpExchange);
@@ -54,14 +60,19 @@ public class Start {
 				e.printStackTrace();
 			}
 
-			JSONObject obj = new JSONObject(bodyString);
+			final JSONObject obj = new JSONObject(bodyString);
 			if (obj.has("pull_request")) {
 
 				System.out.println("Receiving a new pull request event : ");
-				final String pullUrl = obj.getJSONObject("pull_request").getString("url");
-				final String diffUrl = obj.getJSONObject("pull_request").getString("diff_url");
-				final String issueUrl = obj.getJSONObject("pull_request").getString("issue_url");
-				final String pullState = obj.getJSONObject("pull_request").getString("state");
+				final String pullUrl = obj.getJSONObject("pull_request")
+						.getString("url");
+				final String diffUrl = obj.getJSONObject("pull_request")
+						.getString("diff_url");
+				final String issueUrl = obj.getJSONObject("pull_request")
+						.getString("issue_url");
+				final String pullState = obj.getJSONObject("pull_request")
+						.getString("state");
+				int numberPull = obj.getInt("number");
 				System.out.println("\tPull URL : " + pullUrl);
 				System.out.println("\tDiff URL : " + diffUrl);
 				System.out.println("\tState : " + pullState);
@@ -69,66 +80,131 @@ public class Start {
 				if (!pullState.equals("closed")) {
 					final URL yahoo = new URL(diffUrl);
 					final URLConnection yc = yahoo.openConnection();
-					final BufferedReader in = new BufferedReader(new InputStreamReader(yc.getInputStream()));
+					final BufferedReader in = new BufferedReader(
+							new InputStreamReader(yc.getInputStream()));
+					final Date date = new java.util.Date();
+
+					final String fileName = numberPull + "_" + date.getTime();
+
+					getCheckstyleFile(fileName,
+							pullUrl.substring(0, pullUrl.indexOf("/pulls/")));
+
+					final String inFileName = "./tmp/in/" + fileName + ".java";
+					final String outFileName = "./tmp/out/" + fileName
+							+ ".check";
+					final FileOutputStream fos = new FileOutputStream(
+							inFileName);
 					String inputLine;
 
 					boolean javaLine = false;
 					while ((inputLine = in.readLine()) != null) {
 
-						if (inputLine.startsWith("diff --git") && inputLine.endsWith(".java")) {
+						if (inputLine.startsWith("diff --git")
+								&& inputLine.endsWith(".java")) {
 							javaLine = true;
 							System.out.println(inputLine);
-						} else if (inputLine.startsWith("diff --git") && !inputLine.endsWith(".java")) {
+						} else if (inputLine.startsWith("diff --git")
+								&& !inputLine.endsWith(".java")) {
 							javaLine = false;
 							System.out.println();
 						}
 
 						if (javaLine == true) {
-							if (inputLine.startsWith("+") && !inputLine.startsWith("+++")) {
+							if (inputLine.startsWith("+")
+									&& !inputLine.startsWith("+++")) {
 								System.out.println(inputLine);
+								fos.write((inputLine.substring(1) + "\n")
+										.getBytes());
 							}
 						}
 					}
 					in.close();
+					fos.flush();
+					fos.close();
 
 					String response = "This is the response";
 
 					httpExchange.sendResponseHeaders(202, response.length());
-					OutputStream os = httpExchange.getResponseBody();
+					final OutputStream os = httpExchange.getResponseBody();
 					os.write(response.getBytes());
 					os.close();
-					commentPR(issueUrl, Start.token);
+//					commentPR(issueUrl, Start.token);
 				} else {
-					System.out.println("The pull request is closed, no need to read");
+					System.out
+							.println("The pull request is closed, no need to read");
 				}
+			}
+		}
+
+		public static void getCheckstyleFile(final String fileName,
+				final String repoUrl) {
+			final String checkstyleFileName = "./tmp/checkstyle/" + fileName
+					+ ".xml";
+			final String stringUrl = repoUrl + "/contents/checkstyle.xml";
+			System.out.println("Url pour contents : " + stringUrl);
+			try {
+				final URL url = new URL(stringUrl);
+				final HttpsURLConnection con = (HttpsURLConnection) url
+						.openConnection();
+
+				con.setRequestMethod("GET");
+				con.setRequestProperty("User-Agent", USER_AGENT);
+				con.setRequestProperty("Authorization", "token " + token);
+				con.setRequestProperty("content-type",
+						"application/json; charset=UTF-8");
+				con.setDoInput(true);
+
+				final BufferedReader in = new BufferedReader(new InputStreamReader(
+						con.getInputStream()));
+				final StringBuilder sb = new StringBuilder();
+				String inputLine;
+				while ((inputLine = in.readLine()) != null) {
+					sb.append(inputLine);
+				}
+				
+				final JSONObject obj = new JSONObject(sb.toString());
+				
+				final FileOutputStream fos = new FileOutputStream(
+						checkstyleFileName);
+				fos.write(obj.getString("content").getBytes());
+				fos.flush();
+				fos.close();
+
+			} catch (final Exception e) {
+				e.printStackTrace();
 			}
 		}
 
 		public static void commentPR(final String issueUrl, final String token) {
 			System.out.println("Writing the comment");
-			final String stringUrl = issueUrl+ "/comments";
+			final String stringUrl = issueUrl + "/comments";
 			System.out.println("Write to url : " + stringUrl);
 
 			try {
 				final URL url = new URL(stringUrl);
-				final HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
-				
+				final HttpsURLConnection con = (HttpsURLConnection) url
+						.openConnection();
+
 				con.setRequestMethod("POST");
 				con.setRequestProperty("User-Agent", USER_AGENT);
 				con.setRequestProperty("Authorization", "token " + token);
-				con.setRequestProperty("content-type", "application/json; charset=UTF-8");
+				con.setRequestProperty("content-type",
+						"application/json; charset=UTF-8");
 				con.setDoOutput(true);
-				
+
 				final JSONObject bodyResponse = new JSONObject();
-				bodyResponse.put("body", "OK : This Pull Request has a good code style");
+				bodyResponse.put("body",
+						"OK : This Pull Request has a good code style");
 				final OutputStream os = con.getOutputStream();
-				System.out.println("Sending message : " + bodyResponse.toString());
+				System.out.println("Sending message : "
+						+ bodyResponse.toString());
 				os.write(bodyResponse.toString().getBytes("UTF-8"));
 				os.flush();
 				os.close();
-				
-				System.out.println("Code : " + con.getResponseCode() + "\nMessage : " + con.getResponseMessage());
-			} catch (Exception e) {
+
+				System.out.println("Code : " + con.getResponseCode()
+						+ "\nMessage : " + con.getResponseMessage());
+			} catch (final Exception e) {
 				e.printStackTrace();
 			}
 		}
