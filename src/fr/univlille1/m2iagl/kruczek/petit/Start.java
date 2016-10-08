@@ -90,8 +90,8 @@ public class Start {
 							pullUrl.substring(0, pullUrl.indexOf("/pulls/")));
 
 					final String inFileName = "./tmp/in/" + fileName + ".java";
-					final String outFileName = "./tmp/out/" + fileName
-							+ ".check";
+//					final String outFileName = "./tmp/out/" + fileName
+//							+ ".check";
 					final FileOutputStream fos = new FileOutputStream(
 							inFileName);
 					String inputLine;
@@ -128,11 +128,23 @@ public class Start {
 					final OutputStream os = httpExchange.getResponseBody();
 					os.write(response.getBytes());
 					os.close();
+					checkFile(fileName);
 //					commentPR(issueUrl, Start.token);
 				} else {
 					System.out
 							.println("The pull request is closed, no need to read");
 				}
+			}
+		}
+		
+		public static void checkFile (final String fileName) {
+			ProcessBuilder pb = new ProcessBuilder("java","-jar", "./lib/checkstyle-7.1.2-all.jar","-c", "./tmp/checkstyle/"+fileName+".xml", "-o", "./tmp/out/"+fileName+".out","./tmp/in/"+fileName+".java");
+			System.out.println("Starting the process");
+			try {
+				Process p = pb.start();
+				System.out.println("Exit Value : " +p.exitValue());
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
 
@@ -150,8 +162,7 @@ public class Start {
 				con.setRequestMethod("GET");
 				con.setRequestProperty("User-Agent", USER_AGENT);
 				con.setRequestProperty("Authorization", "token " + token);
-				con.setRequestProperty("content-type",
-						"application/json; charset=UTF-8");
+				con.setRequestProperty("Accept", "application/vnd.github-blob.raw");
 				con.setDoInput(true);
 
 				final BufferedReader in = new BufferedReader(new InputStreamReader(
@@ -162,11 +173,9 @@ public class Start {
 					sb.append(inputLine);
 				}
 				
-				final JSONObject obj = new JSONObject(sb.toString());
-				
 				final FileOutputStream fos = new FileOutputStream(
 						checkstyleFileName);
-				fos.write(obj.getString("content").getBytes());
+				fos.write(sb.toString().getBytes());
 				fos.flush();
 				fos.close();
 
