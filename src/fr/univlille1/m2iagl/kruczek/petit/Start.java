@@ -108,62 +108,16 @@ public class Start {
 
 					getCheckstyleFile(fileName,
 							pullUrl.substring(0, pullUrl.indexOf("/pulls/")));
-<<<<<<< HEAD
 					getJavaDiffFile(fileName, diffUrlStr);
 					executeCheckstyle(fileName);
 					//commentPR(issueUrl, Start.token, fileName);
 					
-=======
-
-					final String inFileName = "./tmp/in/" + fileName + ".java";
-//					final String outFileName = "./tmp/out/" + fileName
-//							+ ".check";
-					final FileOutputStream fos = new FileOutputStream(
-							inFileName);
-					String inputLine;
-
-					boolean javaLine = false;
-					while ((inputLine = in.readLine()) != null) {
-
-						if (inputLine.startsWith("diff --git")
-								&& inputLine.endsWith(".java")) {
-							javaLine = true;
-							System.out.println(inputLine);
-						} else if (inputLine.startsWith("diff --git")
-								&& !inputLine.endsWith(".java")) {
-							javaLine = false;
-							System.out.println();
-						}
-
-						if (javaLine == true) {
-							if (inputLine.startsWith("+")
-									&& !inputLine.startsWith("+++")) {
-								System.out.println(inputLine);
-								fos.write((inputLine.substring(1) + "\n")
-										.getBytes());
-							}
-						}
-					}
-					in.close();
-					fos.flush();
-					fos.close();
-
-					String response = "This is the response";
-
-					httpExchange.sendResponseHeaders(202, response.length());
-					final OutputStream os = httpExchange.getResponseBody();
-					os.write(response.getBytes());
-					os.close();
-					checkFile(fileName);
-//					commentPR(issueUrl, Start.token);
->>>>>>> 67de51e5e5b5be800b9f6b14e9efa5144ee30935
 				} else {
 					System.out.println("The pull request is closed, no need to read");
 				}
 			}
 		}
 		
-<<<<<<< HEAD
 		public void executeCheckstyle(String fileName) throws IOException {
 			String checkstyle="lib/checkstyle-7.1.2-all.jar -c";
 			String checkstyleFile="tmp/checkstyle/"+fileName+".xml" ;
@@ -178,17 +132,6 @@ public class Start {
 			
 			//execution de la command
 			Process cat = Runtime.getRuntime().exec(command);
-=======
-		public static void checkFile (final String fileName) {
-			ProcessBuilder pb = new ProcessBuilder("java","-jar", "./lib/checkstyle-7.1.2-all.jar","-c", "./tmp/checkstyle/"+fileName+".xml", "-o", "./tmp/out/"+fileName+".out","./tmp/in/"+fileName+".java");
-			System.out.println("Starting the process");
-			try {
-				Process p = pb.start();
-				System.out.println("Exit Value : " +p.exitValue());
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
->>>>>>> 67de51e5e5b5be800b9f6b14e9efa5144ee30935
 		}
 
 		public static void getCheckstyleFile(final String fileName,final String repoUrl) {
@@ -210,7 +153,8 @@ public class Start {
 				con.setRequestMethod("GET");
 				con.setRequestProperty("User-Agent", USER_AGENT);
 				con.setRequestProperty("Authorization", "token " + token);
-				con.setRequestProperty("Accept", "application/vnd.github-blob.raw");
+				con.setRequestProperty("content-type",
+						"application/json; charset=UTF-8");
 				con.setDoInput(true);
 
 				final BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
@@ -219,7 +163,6 @@ public class Start {
 				while ((inputLine = in.readLine()) != null) {
 					sb.append(inputLine);	
 				}
-<<<<<<< HEAD
 				final JSONObject obj = new JSONObject(sb.toString());
 				
 				//creation du fichier checkstyle
@@ -237,12 +180,6 @@ public class Start {
 				xmlStr = xmlStr.replace("<module name=\"TreeWalker\">","<module name=\"TreeWalker\">\n"+fileConHolder);
 				
 				fos.write(xmlStr.getBytes());
-=======
-				
-				final FileOutputStream fos = new FileOutputStream(
-						checkstyleFileName);
-				fos.write(sb.toString().getBytes());
->>>>>>> 67de51e5e5b5be800b9f6b14e9efa5144ee30935
 				fos.flush();
 				fos.close();
 
