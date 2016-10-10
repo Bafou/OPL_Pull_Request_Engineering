@@ -29,10 +29,7 @@ import com.sun.net.httpserver.HttpServer;
 
 public class Start {
 
-	public static String token = "";// Antoine token =
-									// db948b18b3c47a3ac8b396f224c299a018b4b2b0
-	// Remi token
-	//public static String token = "4bc78b59f3afd601aa44445fc18f92592c19af3d";
+	public static String token = "";
 	public String repoUrl;
 	
 	public static void main(String[] args) throws IOException {
