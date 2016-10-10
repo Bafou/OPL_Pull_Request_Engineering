@@ -4,11 +4,10 @@ import java.util.ArrayList;
 
 public class Fichier {
 	public String path;
-	public ArrayList lignes =new ArrayList();
-	public ArrayList iLignes =new ArrayList();
+	public ArrayList<String> lignes =new ArrayList<String>();
+	public ArrayList<String> iLignes =new ArrayList<String>();
 	
 	public Fichier(String path) {
-		//System.out.println("creation fichier");
 		this.path=path;
 	}
 
